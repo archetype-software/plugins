@@ -321,19 +321,61 @@ NSString *const errorMethod = @"error";
 - (void)setCaptureSessionPreset:(FLTResolutionPreset)resolutionPreset {
   switch (resolutionPreset) {
     case FLTResolutionPresetMax:
-    case FLTResolutionPresetUltraHigh:
+      if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetPhoto]) {
+          _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+          _previewSize = CGSizeMake(4032, 3024);
+          break;
+      }
       if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset3840x2160]) {
-        _captureSession.sessionPreset = AVCaptureSessionPreset3840x2160;
-        _previewSize = CGSizeMake(3840, 2160);
-        break;
+          _captureSession.sessionPreset = AVCaptureSessionPreset3840x2160;
+          _previewSize = CGSizeMake(3840, 2160);
+          break;
       }
       if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetHigh]) {
-        _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
-        _previewSize =
-            CGSizeMake(_captureDevice.activeFormat.highResolutionStillImageDimensions.width,
-                       _captureDevice.activeFormat.highResolutionStillImageDimensions.height);
+          _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
+          _previewSize =
+          CGSizeMake(_captureDevice.activeFormat.highResolutionStillImageDimensions.width,
+                     _captureDevice.activeFormat.highResolutionStillImageDimensions.height);
+          break;
+      }
+      case FLTResolutionPresetUltraHigh: {
+        AVCaptureDeviceFormat* chosenFormat = _captureDevice.formats[0];
+
+        for (AVCaptureDeviceFormat* format in _captureDevice.formats) {
+            CMVideoDimensions currentDimensions = CMVideoFormatDescriptionGetDimensions(chosenFormat.formatDescription);
+            CMVideoDimensions dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription);
+            float validRatio = 4 / (float) 3;
+            float resolutionRatio = dimensions.width / (float) dimensions.height;
+            if (resolutionRatio == validRatio) {
+                 NSLog(@"Valid resolution: %d x %d : %f == %f", dimensions.width, dimensions.height, resolutionRatio, validRatio);
+                if (dimensions.width > currentDimensions.width && dimensions.width < 4032) {
+                     NSLog(@"Setting current resolution to: %d x %d : %f == %f", dimensions.width, dimensions.height, resolutionRatio, validRatio);
+                    chosenFormat = format;
+                }
+            }
+        }
+
+          if ( [_captureDevice lockForConfiguration: NULL] ) {
+              [_captureDevice setActiveFormat: chosenFormat];
+              [_captureDevice unlockForConfiguration];
+          }
+
+        _previewSize = CGSizeMake(3264, 2448);
         break;
       }
+          
+//      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset3840x2160]) {
+//        _captureSession.sessionPreset = AVCaptureSessionPreset3840x2160;
+//        _previewSize = CGSizeMake(3840, 2160);
+//        break;
+//      }
+//      if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetHigh]) {
+//        _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
+//        _previewSize =
+//            CGSizeMake(_captureDevice.activeFormat.highResolutionStillImageDimensions.width,
+//                       _captureDevice.activeFormat.highResolutionStillImageDimensions.height);
+//        break;
+//      }
     case FLTResolutionPresetVeryHigh:
       if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
         _captureSession.sessionPreset = AVCaptureSessionPreset1920x1080;
