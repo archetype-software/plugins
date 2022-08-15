@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'camera_avfoundation'
-  s.version          = '0.0.5'
+  s.version          = '0.0.6'
   s.summary          = 'Flutter Camera'
   s.description      = <<-DESC
 A Flutter plugin to use the camera from your Flutter app.
