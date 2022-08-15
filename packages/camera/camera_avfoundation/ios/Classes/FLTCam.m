@@ -321,6 +321,10 @@ NSString *const errorMethod = @"error";
 - (void)setCaptureSessionPreset:(FLTResolutionPreset)resolutionPreset {
   switch (resolutionPreset) {
     case FLTResolutionPresetMax:
+      if ( [_captureDevice lockForConfiguration: NULL] ) {
+          [_captureDevice setVideoHDREnabled:true];
+          [_captureDevice unlockForConfiguration];
+      }
       if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetPhoto]) {
           _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
           _previewSize = CGSizeMake(4032, 3024);
@@ -339,6 +343,11 @@ NSString *const errorMethod = @"error";
           break;
       }
       case FLTResolutionPresetUltraHigh: {
+          if ( [_captureDevice lockForConfiguration: NULL] ) {
+              [_captureDevice setVideoHDREnabled:true];
+              [_captureDevice unlockForConfiguration];
+          }
+          
         AVCaptureDeviceFormat* chosenFormat = _captureDevice.formats[0];
 
         for (AVCaptureDeviceFormat* format in _captureDevice.formats) {
