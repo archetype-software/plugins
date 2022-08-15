@@ -322,6 +322,7 @@ NSString *const errorMethod = @"error";
   switch (resolutionPreset) {
     case FLTResolutionPresetMax:
       if ( [_captureDevice lockForConfiguration: NULL] ) {
+          [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
           [_captureDevice setVideoHDREnabled:true];
           [_captureDevice unlockForConfiguration];
       }
@@ -344,6 +345,7 @@ NSString *const errorMethod = @"error";
       }
       case FLTResolutionPresetUltraHigh: {
           if ( [_captureDevice lockForConfiguration: NULL] ) {
+              [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
               [_captureDevice setVideoHDREnabled:true];
               [_captureDevice unlockForConfiguration];
           }
