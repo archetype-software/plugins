@@ -324,6 +324,7 @@ NSString *const errorMethod = @"error";
       if ( [_captureDevice lockForConfiguration: NULL] ) {
           [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
           [_captureDevice setVideoHDREnabled:true];
+          _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
           [_captureDevice unlockForConfiguration];
       }
       if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetPhoto]) {
@@ -347,6 +348,7 @@ NSString *const errorMethod = @"error";
           if ( [_captureDevice lockForConfiguration: NULL] ) {
               [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
               [_captureDevice setVideoHDREnabled:true];
+              _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
               [_captureDevice unlockForConfiguration];
           }
           
