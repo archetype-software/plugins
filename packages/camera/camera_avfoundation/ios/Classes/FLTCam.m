@@ -386,16 +386,16 @@ NSString *const errorMethod = @"error";
 //        break;
 //      }
     case FLTResolutionPresetVeryHigh:
-//      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset3840x2160]) {
-//        _captureSession.sessionPreset = AVCaptureSessionPreset1920x1080;
-//        _previewSize = CGSizeMake(3840, 2160);
-//        break;
-//      }
-      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
+      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset3840x2160]) {
         _captureSession.sessionPreset = AVCaptureSessionPreset1920x1080;
-        _previewSize = CGSizeMake(1920, 1080);
+        _previewSize = CGSizeMake(3840, 2160);
         break;
       }
+//      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
+//        _captureSession.sessionPreset = AVCaptureSessionPreset1920x1080;
+//        _previewSize = CGSizeMake(1920, 1080);
+//        break;
+//      }
       if ( [_captureDevice lockForConfiguration: NULL] ) {
           [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
           [_captureDevice setVideoHDREnabled:true];
@@ -404,17 +404,39 @@ NSString *const errorMethod = @"error";
       }
           
     case FLTResolutionPresetHigh:
-      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
-        _captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
-        _previewSize = CGSizeMake(1280, 720);
-        break;
-      }
+          if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
+            _captureSession.sessionPreset = AVCaptureSessionPreset1920x1080;
+            _previewSize = CGSizeMake(1920, 1080);
+            break;
+          }
+          if ( [_captureDevice lockForConfiguration: NULL] ) {
+              [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
+              [_captureDevice setVideoHDREnabled:true];
+              _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
+              [_captureDevice unlockForConfiguration];
+          }
+//      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+//        _captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
+//        _previewSize = CGSizeMake(1280, 720);
+//        break;
+//      }
     case FLTResolutionPresetMedium:
-      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset640x480]) {
-        _captureSession.sessionPreset = AVCaptureSessionPreset640x480;
-        _previewSize = CGSizeMake(640, 480);
-        break;
-      }
+          if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+            _captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
+            _previewSize = CGSizeMake(1280, 720);
+            break;
+          }
+          if ( [_captureDevice lockForConfiguration: NULL] ) {
+              [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
+              [_captureDevice setVideoHDREnabled:true];
+              _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
+              [_captureDevice unlockForConfiguration];
+          }
+//      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset640x480]) {
+//        _captureSession.sessionPreset = AVCaptureSessionPreset640x480;
+//        _previewSize = CGSizeMake(640, 480);
+//        break;
+//      }
     case FLTResolutionPresetLow:
       if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset352x288]) {
         _captureSession.sessionPreset = AVCaptureSessionPreset352x288;
