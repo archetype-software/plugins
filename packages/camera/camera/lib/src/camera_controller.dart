@@ -45,6 +45,7 @@ class CameraValue {
     required this.flashMode,
     required this.exposureMode,
     required this.focusMode,
+    required this.hdrEnabled,
     required this.exposurePointSupported,
     required this.focusPointSupported,
     required this.deviceOrientation,
@@ -65,6 +66,7 @@ class CameraValue {
           flashMode: FlashMode.auto,
           exposureMode: ExposureMode.auto,
           exposurePointSupported: false,
+          hdrEnabled: false,
           focusMode: FocusMode.auto,
           focusPointSupported: false,
           deviceOrientation: DeviceOrientation.portraitUp,
@@ -130,6 +132,9 @@ class CameraValue {
   /// Whether setting the focus point is supported.
   final bool focusPointSupported;
 
+  /// True when HDR is enabled.
+  final bool hdrEnabled;
+
   /// The current device UI orientation.
   final DeviceOrientation deviceOrientation;
 
@@ -157,6 +162,7 @@ class CameraValue {
     FlashMode? flashMode,
     ExposureMode? exposureMode,
     FocusMode? focusMode,
+    bool? hdrEnabled,
     bool? exposurePointSupported,
     bool? focusPointSupported,
     DeviceOrientation? deviceOrientation,
@@ -176,6 +182,7 @@ class CameraValue {
       flashMode: flashMode ?? this.flashMode,
       exposureMode: exposureMode ?? this.exposureMode,
       focusMode: focusMode ?? this.focusMode,
+      hdrEnabled: hdrEnabled ?? this.hdrEnabled,
       exposurePointSupported:
           exposurePointSupported ?? this.exposurePointSupported,
       focusPointSupported: focusPointSupported ?? this.focusPointSupported,
@@ -204,6 +211,7 @@ class CameraValue {
         'flashMode: $flashMode, '
         'exposureMode: $exposureMode, '
         'focusMode: $focusMode, '
+        'hdrEnabled: $hdrEnabled, '
         'exposurePointSupported: $exposurePointSupported, '
         'focusPointSupported: $focusPointSupported, '
         'deviceOrientation: $deviceOrientation, '
@@ -758,6 +766,16 @@ class CameraController extends ValueNotifier<CameraValue> {
     try {
       await CameraPlatform.instance.setFocusMode(_cameraId, mode);
       value = value.copyWith(focusMode: mode);
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
+  }
+
+  /// Sets the focus mode for taking pictures.
+  Future<void> setHDREnabled(bool hdrEnabled) async {
+    try {
+      await CameraPlatform.instance.setHDREnabled(hdrEnabled);
+      value = value.copyWith(hdrEnabled: hdrEnabled);
     } on PlatformException catch (e) {
       throw CameraException(e.code, e.message);
     }

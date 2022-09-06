@@ -89,6 +89,9 @@ class FakeController extends ValueNotifier<CameraValue>
   Future<void> setFocusMode(FocusMode mode) async {}
 
   @override
+  Future<void> setHDREnabled(bool hdrEnabled) async {}
+
+  @override
   Future<void> setFocusPoint(Offset? point) async {}
 
   @override
