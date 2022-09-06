@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'camera_avfoundation'
-  s.version          = '0.0.9'
+  s.version          = '0.1.0'
   s.summary          = 'Flutter Camera'
   s.description      = <<-DESC
 A Flutter plugin to use the camera from your Flutter app.
@@ -12,6 +12,7 @@ A Flutter plugin to use the camera from your Flutter app.
   s.license          = { :type => 'BSD', :file => '../LICENSE' }
   s.author           = { 'Flutter Dev Team' => 'flutter-dev@googlegroups.com' }
   s.source           = { :http => 'https://github.com/archetype-software/plugins/tree/main/packages/camera_avfoundation' }
+#   s.source           = { :path => '.' }
   s.documentation_url = 'https://pub.dev/packages/camera_avfoundation'
   s.source_files = 'Classes/**/*.{h,m}'
   s.public_header_files = 'Classes/**/*.h'

@@ -338,13 +338,6 @@ NSString *const errorMethod = @"error";
                      _captureDevice.activeFormat.highResolutionStillImageDimensions.height);
           break;
       }
-          
-      if ( [_captureDevice lockForConfiguration: NULL] ) {
-          [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
-          [_captureDevice setVideoHDREnabled:true];
-          [_captureDevice unlockForConfiguration];
-      }
-          
       case FLTResolutionPresetUltraHigh: {
         AVCaptureDeviceFormat* chosenFormat = _captureDevice.formats[0];
 
@@ -364,8 +357,6 @@ NSString *const errorMethod = @"error";
 
           if ( [_captureDevice lockForConfiguration: NULL] ) {
               [_captureDevice setActiveFormat: chosenFormat];
-              [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
-              [_captureDevice setVideoHDREnabled:true];
               [_captureDevice unlockForConfiguration];
           }
 
@@ -397,8 +388,6 @@ NSString *const errorMethod = @"error";
 //        break;
 //      }
       if ( [_captureDevice lockForConfiguration: NULL] ) {
-          [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
-          [_captureDevice setVideoHDREnabled:true];
           _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
           [_captureDevice unlockForConfiguration];
       }
@@ -410,8 +399,6 @@ NSString *const errorMethod = @"error";
             break;
           }
           if ( [_captureDevice lockForConfiguration: NULL] ) {
-              [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
-              [_captureDevice setVideoHDREnabled:true];
               _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
               [_captureDevice unlockForConfiguration];
           }
@@ -427,8 +414,6 @@ NSString *const errorMethod = @"error";
             break;
           }
           if ( [_captureDevice lockForConfiguration: NULL] ) {
-              [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
-              [_captureDevice setVideoHDREnabled:true];
               _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
               [_captureDevice unlockForConfiguration];
           }
@@ -905,6 +890,21 @@ NSString *const errorMethod = @"error";
       break;
   }
   [captureDevice unlockForConfiguration];
+}
+
+- (void)setHDREnabledWithResult:(FLTThreadSafeFlutterResult *)result hdrEnabled:(BOOL)enabled {
+    if ( [_captureDevice lockForConfiguration: NULL] ) {
+        [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
+        [_captureDevice setVideoHDREnabled:enabled];
+        [_captureDevice unlockForConfiguration];
+        [result sendSuccess];
+    }
+    else {
+        [result sendErrorWithCode:@"setHDREnabledFailed"
+                          message:@"Could not lock capture device for configuration"
+                          details:nil];
+        return;
+    }
 }
 
 - (void)pausePreviewWithResult:(FLTThreadSafeFlutterResult *)result {

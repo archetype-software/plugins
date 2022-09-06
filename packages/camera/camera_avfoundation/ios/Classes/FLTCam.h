@@ -88,6 +88,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resumePreviewWithResult:(FLTThreadSafeFlutterResult *)result;
 - (void)setExposurePointWithResult:(FLTThreadSafeFlutterResult *)result x:(double)x y:(double)y;
 - (void)setFocusPointWithResult:(FLTThreadSafeFlutterResult *)result x:(double)x y:(double)y;
+- (void)setHDREnabledWithResult:(FLTThreadSafeFlutterResult *)result hdrEnabled:(BOOL)enabled;
 - (void)setExposureOffsetWithResult:(FLTThreadSafeFlutterResult *)result offset:(double)offset;
 - (void)startImageStreamWithMessenger:(NSObject<FlutterBinaryMessenger> *)messenger;
 - (void)stopImageStream;

@@ -56,6 +56,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   VideoPlayerController? videoController;
   VoidCallback? videoPlayerListener;
   bool enableAudio = true;
+  bool enableHDR = false;
   double _minAvailableExposureOffset = 0.0;
   double _maxAvailableExposureOffset = 0.0;
   double _currentExposureOffset = 0.0;
@@ -297,6 +298,11 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                     )
                   ]
                 : <Widget>[],
+            IconButton(
+              icon: Icon(enableHDR ? Icons.hdr_on : Icons.hdr_off),
+              color: Colors.blue,
+              onPressed: controller != null ? onHDRButtonPressed : null,
+            ),
             IconButton(
               icon: Icon(enableAudio ? Icons.volume_up : Icons.volume_mute),
               color: Colors.blue,
@@ -798,6 +804,17 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     }
   }
 
+  void onHDRButtonPressed() {
+    setHDREnabled(!enableHDR).then((_) {
+      if (mounted) {
+        setState(() {
+          enableHDR = !enableHDR;
+        });
+      }
+      showInSnackBar('HDR ${enableHDR ? 'enabled' : 'disabled'}');
+    });
+  }
+
   void onSetFlashModeButtonPressed(FlashMode mode) {
     setFlashMode(mode).then((_) {
       if (mounted) {
@@ -943,6 +960,19 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
     try {
       await cameraController.resumeVideoRecording();
+    } on CameraException catch (e) {
+      _showCameraException(e);
+      rethrow;
+    }
+  }
+
+  Future<void> setHDREnabled(bool enabled) async {
+    if (controller == null) {
+      return;
+    }
+
+    try {
+      await controller!.setHDREnabled(enabled);
     } on CameraException catch (e) {
       _showCameraException(e);
       rethrow;

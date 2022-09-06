@@ -248,7 +248,11 @@
         y = ((NSNumber *)call.arguments[@"y"]).doubleValue;
       }
       [_camera setFocusPointWithResult:result x:x y:y];
-    } else if ([@"pausePreview" isEqualToString:call.method]) {
+    } else if ([@"setHDREnabled" isEqualToString:call.method]) {
+        BOOL hdrEnabled = ((NSNumber *)call.arguments[@"hdrEnabled"]).boolValue;
+        [_camera setHDREnabledWithResult:result hdrEnabled:hdrEnabled];
+    }
+    else if ([@"pausePreview" isEqualToString:call.method]) {
       [_camera pausePreviewWithResult:result];
     } else if ([@"resumePreview" isEqualToString:call.method]) {
       [_camera resumePreviewWithResult:result];

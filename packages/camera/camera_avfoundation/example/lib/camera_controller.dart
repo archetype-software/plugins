@@ -23,6 +23,7 @@ class CameraValue {
     required this.flashMode,
     required this.exposureMode,
     required this.focusMode,
+    required this.hdrEnabled,
     required this.deviceOrientation,
     this.lockedCaptureOrientation,
     this.recordingOrientation,
@@ -41,6 +42,7 @@ class CameraValue {
           flashMode: FlashMode.auto,
           exposureMode: ExposureMode.auto,
           focusMode: FocusMode.auto,
+          hdrEnabled: false,
           deviceOrientation: DeviceOrientation.portraitUp,
           isPreviewPaused: false,
         );
@@ -80,6 +82,9 @@ class CameraValue {
   /// The focus mode the camera is currently set to.
   final FocusMode focusMode;
 
+  /// True when HDR is enabled.
+  final bool hdrEnabled;
+
   /// The current device UI orientation.
   final DeviceOrientation deviceOrientation;
 
@@ -106,6 +111,7 @@ class CameraValue {
     FlashMode? flashMode,
     ExposureMode? exposureMode,
     FocusMode? focusMode,
+    bool? hdrEnabled,
     bool? exposurePointSupported,
     bool? focusPointSupported,
     DeviceOrientation? deviceOrientation,
@@ -124,6 +130,7 @@ class CameraValue {
       flashMode: flashMode ?? this.flashMode,
       exposureMode: exposureMode ?? this.exposureMode,
       focusMode: focusMode ?? this.focusMode,
+      hdrEnabled: hdrEnabled ?? this.hdrEnabled,
       deviceOrientation: deviceOrientation ?? this.deviceOrientation,
       lockedCaptureOrientation: lockedCaptureOrientation == null
           ? this.lockedCaptureOrientation
@@ -408,6 +415,12 @@ class CameraController extends ValueNotifier<CameraValue> {
   Future<void> setFocusMode(FocusMode mode) async {
     await CameraPlatform.instance.setFocusMode(_cameraId, mode);
     value = value.copyWith(focusMode: mode);
+  }
+
+  /// Sets HDR enabled / disabled for taking pictures & videos.
+  Future<void> setHDREnabled(bool hdrEnabled) async {
+    await CameraPlatform.instance.setHDREnabled(hdrEnabled);
+    value = value.copyWith(hdrEnabled: hdrEnabled);
   }
 
   /// Releases the resources of this camera.
