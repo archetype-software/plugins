@@ -247,6 +247,11 @@ abstract class CameraPlatform extends PlatformInterface {
     throw UnimplementedError('setZoomLevel() is not implemented.');
   }
 
+  /// Sets the HDR mode for taking pictures & videos.
+  Future<void> setHDREnabled(bool hdrEnabled) {
+    throw UnimplementedError('setHDREnabled() is not implemented.');
+  }
+
   /// Pause the active preview on the current frame for the selected camera.
   Future<void> pausePreview(int cameraId) {
     throw UnimplementedError('pausePreview() is not implemented.');

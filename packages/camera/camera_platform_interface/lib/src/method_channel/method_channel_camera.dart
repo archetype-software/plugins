@@ -467,6 +467,18 @@ class MethodChannelCamera extends CameraPlatform {
   }
 
   @override
+  Future<void> setHDREnabled(bool hdrEnabled) async {
+    try {
+      await _channel.invokeMethod<void>(
+        'setHDREnabled',
+        <String, dynamic>{ 'hdrEnabled': hdrEnabled },
+      );
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
+  }
+
+  @override
   Future<void> pausePreview(int cameraId) async {
     await _channel.invokeMethod<double>(
       'pausePreview',
