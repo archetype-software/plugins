@@ -252,6 +252,11 @@ abstract class CameraPlatform extends PlatformInterface {
     throw UnimplementedError('setHDREnabled() is not implemented.');
   }
 
+  /// Sets the frames per second that videos should be captured with.
+  Future<void> setFramesPerSecond(double fps) {
+    throw UnimplementedError('setFramesPerSecond() is not implemented.');
+  }
+
   /// Pause the active preview on the current frame for the selected camera.
   Future<void> pausePreview(int cameraId) {
     throw UnimplementedError('pausePreview() is not implemented.');
