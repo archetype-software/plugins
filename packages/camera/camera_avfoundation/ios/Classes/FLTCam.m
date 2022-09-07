@@ -40,6 +40,7 @@
 
 @property(readonly, nonatomic) int64_t textureId;
 @property BOOL enableAudio;
+@property BOOL enableHDR;
 @property(nonatomic) FLTImageStreamHandler *imageStreamHandler;
 @property(readonly, nonatomic) AVCaptureSession *captureSession;
 
@@ -119,6 +120,7 @@ NSString *const errorMethod = @"error";
     *error = e;
   }
   _enableAudio = enableAudio;
+  _enableHDR = false;
   _captureSessionQueue = captureSessionQueue;
   _pixelBufferSynchronizationQueue =
       dispatch_queue_create("io.flutter.camera.pixelBufferSynchronizationQueue", NULL);
@@ -387,20 +389,12 @@ NSString *const errorMethod = @"error";
 //        _previewSize = CGSizeMake(1920, 1080);
 //        break;
 //      }
-      if ( [_captureDevice lockForConfiguration: NULL] ) {
-          _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
-          [_captureDevice unlockForConfiguration];
-      }
           
     case FLTResolutionPresetHigh:
           if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
             _captureSession.sessionPreset = AVCaptureSessionPreset1920x1080;
             _previewSize = CGSizeMake(1920, 1080);
             break;
-          }
-          if ( [_captureDevice lockForConfiguration: NULL] ) {
-              _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
-              [_captureDevice unlockForConfiguration];
           }
 //      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
 //        _captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
@@ -412,10 +406,6 @@ NSString *const errorMethod = @"error";
             _captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
             _previewSize = CGSizeMake(1280, 720);
             break;
-          }
-          if ( [_captureDevice lockForConfiguration: NULL] ) {
-              _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, 60);
-              [_captureDevice unlockForConfiguration];
           }
 //      if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset640x480]) {
 //        _captureSession.sessionPreset = AVCaptureSessionPreset640x480;
@@ -892,11 +882,12 @@ NSString *const errorMethod = @"error";
   [captureDevice unlockForConfiguration];
 }
 
-- (void)setHDREnabledWithResult:(FLTThreadSafeFlutterResult *)result hdrEnabled:(BOOL)enabled {
+- (void) setHDREnabledWithResult:(FLTThreadSafeFlutterResult *)result hdrEnabled:(BOOL)enabled {
     if ( [_captureDevice lockForConfiguration: NULL] ) {
         [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
         [_captureDevice setVideoHDREnabled:enabled];
         [_captureDevice unlockForConfiguration];
+        _enableHDR = enabled;
         [result sendSuccess];
     }
     else {
@@ -904,6 +895,80 @@ NSString *const errorMethod = @"error";
                           message:@"Could not lock capture device for configuration"
                           details:nil];
         return;
+    }
+}
+
+- (void) setFramesPerSecondWithResult:(FLTThreadSafeFlutterResult *)result frameRate:(double)frameRate {
+    // Check if requested frame rate is supported
+    BOOL isSupported = false;
+    BOOL isHDREnabled = _captureDevice.isVideoHDREnabled && _enableHDR;
+    AVCaptureDeviceFormat* _updatedFormat;
+    
+    NSLog(@"Current format preview dimensions: %.2f x %.2f", _previewSize.width, _previewSize.height);
+    
+    for (AVCaptureDeviceFormat* format in _captureDevice.formats) {
+        for (AVFrameRateRange* range in format.videoSupportedFrameRateRanges) {
+            // NSLog(@"Available frame rate in format %@: %.2f", format.description, range.maxFrameRate);
+            // If we found a format that matches the frame rate we want
+            if (range.maxFrameRate >= frameRate) {
+                // We need to check that it matches session's selected resolution
+                CMVideoDimensions dimensions = format.highResolutionStillImageDimensions;
+                if (dimensions.width == _previewSize.width && dimensions.height == _previewSize.height) {
+                    
+                    NSString* hdrSupported = format.isVideoHDRSupported ? @"Yes" : @"No";
+                    NSString* hdrEnabled = isHDREnabled ? @"Yes" : @"No";
+                    
+                    NSLog(@"Res: %.2d %.2d, HDR On: %@, HDR Support: %@", dimensions.width, dimensions.height, hdrEnabled, hdrSupported);
+                    
+                    // We need to check that it also has HDR support. We always opt for an HDR format since the user can turn on HDR
+                    if (format.isVideoHDRSupported) {
+                        isSupported = true;
+                        _updatedFormat = format;
+                    }
+//                    if (isHDREnabled) {
+//                        if (format.isVideoHDRSupported) {
+//                            isSupported = true;
+//                            _updatedFormat = format;
+//                        }
+//                    }
+//                    else {
+//                        isSupported = true;
+//                        _updatedFormat = format;
+//                    }
+                }
+            }
+        }
+    }
+    
+//    for (AVFrameRateRange* range in _captureDevice.activeFormat.videoSupportedFrameRateRanges) {
+//        NSLog(@"Available frame rate: %.2f", range.maxFrameRate);
+//        if (range.maxFrameRate >= frameRate) isSupported = true;
+//    }
+    
+    if (!isSupported) {
+        [result sendErrorWithCode:@"setFramesPerSecondFailed"
+                          message:@"The requested frame rate is not supported by the current device"
+                          details:nil];
+        return;
+    }
+    
+    if ( [_captureDevice lockForConfiguration: NULL] ) {
+        [_captureDevice setActiveFormat: _updatedFormat];
+        [_captureDevice unlockForConfiguration];
+    }
+    
+    // Set the frame rate
+    if ( [_captureDevice lockForConfiguration: NULL] ) {
+        _captureDevice.activeVideoMinFrameDuration = CMTimeMake(1, frameRate);
+        _captureDevice.activeVideoMaxFrameDuration = CMTimeMake(1, frameRate);
+        
+        if (isHDREnabled && _captureDevice.activeFormat.isVideoHDRSupported) {
+            [_captureDevice setAutomaticallyAdjustsVideoHDREnabled:false];
+            [_captureDevice setVideoHDREnabled:true];
+        }
+        
+        [_captureDevice unlockForConfiguration];
+        [result sendSuccess];
     }
 }
 

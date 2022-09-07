@@ -252,6 +252,10 @@
         BOOL hdrEnabled = ((NSNumber *)call.arguments[@"hdrEnabled"]).boolValue;
         [_camera setHDREnabledWithResult:result hdrEnabled:hdrEnabled];
     }
+    else if ([@"setFramesPerSecond" isEqualToString:call.method]) {
+        double fps = ((NSNumber *)call.arguments[@"fps"]).doubleValue;
+        [_camera setFramesPerSecondWithResult:result frameRate:fps];
+    }
     else if ([@"pausePreview" isEqualToString:call.method]) {
       [_camera pausePreviewWithResult:result];
     } else if ([@"resumePreview" isEqualToString:call.method]) {
