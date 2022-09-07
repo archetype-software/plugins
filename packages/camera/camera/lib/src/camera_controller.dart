@@ -46,6 +46,7 @@ class CameraValue {
     required this.exposureMode,
     required this.focusMode,
     required this.hdrEnabled,
+    required this.fps,
     required this.exposurePointSupported,
     required this.focusPointSupported,
     required this.deviceOrientation,
@@ -67,6 +68,7 @@ class CameraValue {
           exposureMode: ExposureMode.auto,
           exposurePointSupported: false,
           hdrEnabled: false,
+          fps: 30,
           focusMode: FocusMode.auto,
           focusPointSupported: false,
           deviceOrientation: DeviceOrientation.portraitUp,
@@ -135,6 +137,9 @@ class CameraValue {
   /// True when HDR is enabled.
   final bool hdrEnabled;
 
+  /// Currently selected FPS.
+  final double fps;
+
   /// The current device UI orientation.
   final DeviceOrientation deviceOrientation;
 
@@ -163,6 +168,7 @@ class CameraValue {
     ExposureMode? exposureMode,
     FocusMode? focusMode,
     bool? hdrEnabled,
+    double? fps,
     bool? exposurePointSupported,
     bool? focusPointSupported,
     DeviceOrientation? deviceOrientation,
@@ -183,6 +189,7 @@ class CameraValue {
       exposureMode: exposureMode ?? this.exposureMode,
       focusMode: focusMode ?? this.focusMode,
       hdrEnabled: hdrEnabled ?? this.hdrEnabled,
+      fps: fps ?? this.fps,
       exposurePointSupported:
           exposurePointSupported ?? this.exposurePointSupported,
       focusPointSupported: focusPointSupported ?? this.focusPointSupported,
@@ -776,6 +783,16 @@ class CameraController extends ValueNotifier<CameraValue> {
     try {
       await CameraPlatform.instance.setHDREnabled(hdrEnabled);
       value = value.copyWith(hdrEnabled: hdrEnabled);
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
+  }
+
+  /// Sets the frames per second that videos should be captured with.
+  Future<void> setFramesPerSecond(double fps) async {
+    try {
+      await CameraPlatform.instance.setFramesPerSecond(fps);
+      value = value.copyWith(fps: fps);
     } on PlatformException catch (e) {
       throw CameraException(e.code, e.message);
     }
